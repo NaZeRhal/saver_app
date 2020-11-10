@@ -121,37 +121,92 @@ class _MyHomePageState extends State<MyHomePage> {
         });
   }
 
+  List<Widget> _buildLandscapeContent(MediaQueryData mediaQuery, AppBar appBar,
+      Widget transactionListContainer) {
+    return [
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Show Chart',
+            style: Theme.of(context).textTheme.title,
+          ),
+          Switch.adaptive(
+            activeColor: Theme.of(context).accentColor,
+            value: _showChart,
+            onChanged: (val) {
+              setState(() {
+                _showChart = val;
+              });
+            },
+          ),
+        ],
+      ),
+      _showChart
+          ? Container(
+              height: (mediaQuery.size.height -
+                      appBar.preferredSize.height -
+                      mediaQuery.padding.top) *
+                  0.65,
+              child: Chart(recentTransactions: _recentTransactions),
+            )
+          : transactionListContainer
+    ];
+  }
+
+  List<Widget> _buildPortraitContent(MediaQueryData mediaQuery, AppBar appBar,
+      Widget transactionListContainer) {
+    return [
+      Container(
+        height: (mediaQuery.size.height -
+                appBar.preferredSize.height -
+                mediaQuery.padding.top) *
+            0.3,
+        child: Chart(recentTransactions: _recentTransactions),
+      ),
+      transactionListContainer
+    ];
+  }
+
+  Widget _buildCupertinoNavBar() {
+    return CupertinoNavigationBar(
+      middle: Text(
+        'Saver App',
+      ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          GestureDetector(
+            child: Icon(CupertinoIcons.add),
+            onTap: () => _startAddingNewTransaction(context),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMaterialAppBar() {
+    return AppBar(
+      title: Text(
+        'Saver App',
+        style: TextStyle(fontFamily: 'OpenSans'),
+      ),
+      actions: [
+        IconButton(
+          icon: Icon(Icons.add),
+          onPressed: () => _startAddingNewTransaction(context),
+        )
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    print('build() MyHomePageState');
     final mediaQuery = MediaQuery.of(context);
     final isLandscape = mediaQuery.orientation == Orientation.landscape;
-    final PreferredSizeWidget appBar = Platform.isIOS
-        ? CupertinoNavigationBar(
-            middle: Text(
-              'Saver App',
-            ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                GestureDetector(
-                  child: Icon(CupertinoIcons.add),
-                  onTap: () => _startAddingNewTransaction(context),
-                )
-              ],
-            ),
-          )
-        : AppBar(
-            title: Text(
-              'Saver App',
-              style: TextStyle(fontFamily: 'OpenSans'),
-            ),
-            actions: [
-              IconButton(
-                icon: Icon(Icons.add),
-                onPressed: () => _startAddingNewTransaction(context),
-              )
-            ],
-          );
+    final PreferredSizeWidget appBar =
+        Platform.isIOS ? _buildCupertinoNavBar() : _buildMaterialAppBar();
 
     final transactionListContainer = Container(
       height: (mediaQuery.size.height -
@@ -169,43 +224,17 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           children: [
             if (isLandscape)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Show Chart',
-                    style: Theme.of(context).textTheme.title,
-                  ),
-                  Switch.adaptive(
-                    activeColor: Theme.of(context).accentColor,
-                    value: _showChart,
-                    onChanged: (val) {
-                      setState(() {
-                        _showChart = val;
-                      });
-                    },
-                  ),
-                ],
+              ..._buildLandscapeContent(
+                mediaQuery,
+                appBar,
+                transactionListContainer,
               ),
             if (!isLandscape)
-              Container(
-                height: (mediaQuery.size.height -
-                        appBar.preferredSize.height -
-                        mediaQuery.padding.top) *
-                    0.3,
-                child: Chart(recentTransactions: _recentTransactions),
+              ..._buildPortraitContent(
+                mediaQuery,
+                appBar,
+                transactionListContainer,
               ),
-            if (!isLandscape) transactionListContainer,
-            if (isLandscape)
-              _showChart
-                  ? Container(
-                      height: (mediaQuery.size.height -
-                              appBar.preferredSize.height -
-                              mediaQuery.padding.top) *
-                          0.65,
-                      child: Chart(recentTransactions: _recentTransactions),
-                    )
-                  : transactionListContainer,
           ],
         ),
       ),
