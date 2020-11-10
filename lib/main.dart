@@ -58,38 +58,58 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   bool _showChart = false;
 
-  final List<Transaction> _userTransactions = [
-    Transaction(
-        id: 't1', title: 'New Shoes', amount: 69.99, date: DateTime.now()),
-    Transaction(
-        id: 't2',
-        title: 'Cinema',
-        amount: 29.99,
-        date: DateTime.now().subtract(Duration(days: 3))),
-    Transaction(
-        id: 't2',
-        title: 'Cafe',
-        amount: 41.79,
-        date: DateTime.now().subtract(Duration(days: 3))),
-    Transaction(
-        id: 't3',
-        title: 'Biking to London',
-        amount: 99.99,
-        date: DateTime.now().subtract(Duration(days: 2))),
-    Transaction(
-        id: 't4',
-        title: 'New Book',
-        amount: 19.99,
-        date: DateTime.now().subtract(Duration(days: 1))),
-    Transaction(
-        id: 't4',
-        title: 'Sport',
-        amount: 39.59,
-        date: DateTime.now().subtract(Duration(days: 1))),
-  ];
+  @override
+  void initState() {
+    //add lifecycle listener
+    WidgetsBinding.instance.addObserver(this);
+    super.initState();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print(state);
+    super.didChangeAppLifecycleState(state);
+  }
+
+  @override
+  void dispose() {
+    //remove lifecycle listner
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  final List<Transaction> _userTransactions = [];
+  //   Transaction(
+  //       id: 't1', title: 'New Shoes', amount: 69.99, date: DateTime.now()),
+  //   Transaction(
+  //       id: 't2',
+  //       title: 'Cinema',
+  //       amount: 29.99,
+  //       date: DateTime.now().subtract(Duration(days: 3))),
+  //   Transaction(
+  //       id: 't2',
+  //       title: 'Cafe',
+  //       amount: 41.79,
+  //       date: DateTime.now().subtract(Duration(days: 3))),
+  //   Transaction(
+  //       id: 't3',
+  //       title: 'Biking to London',
+  //       amount: 99.99,
+  //       date: DateTime.now().subtract(Duration(days: 2))),
+  //   Transaction(
+  //       id: 't4',
+  //       title: 'New Book',
+  //       amount: 19.99,
+  //       date: DateTime.now().subtract(Duration(days: 1))),
+  //   Transaction(
+  //       id: 't4',
+  //       title: 'Sport',
+  //       amount: 39.59,
+  //       date: DateTime.now().subtract(Duration(days: 1))),
+  // ];
 
   List<Transaction> get _recentTransactions {
     return _userTransactions.where((tx) {
@@ -202,7 +222,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    print('build() MyHomePageState');
     final mediaQuery = MediaQuery.of(context);
     final isLandscape = mediaQuery.orientation == Orientation.landscape;
     final PreferredSizeWidget appBar =
